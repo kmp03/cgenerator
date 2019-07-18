@@ -1,25 +1,19 @@
 cmake_minimum_required(VERSION 3.10)
 
-    project(codegenerator)
+project(codegenerator)
 
-    set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 14)
 
-    find_package(Boost)
-    IF (Boost_FOUND)
-    include_directories(${Boost_INCLUDE_DIR})
-endif()
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++17 -lpqxx -lpq")
-
-set(PQXX /usr/local/include/pqxx)
-
+find_package(Boost)
 find_library(PQXX_LIB pqxx)
 find_library(PQ_LIB pq)
 
-file(GLOB_RECURSE SOURCE_FILES "src/*.cpp")
+set(SOURCE_FILES main.cpp)
+set(HEADER_FILES )
 
+add_custom_target(headers SOURCES ${HEADER_FILES})
 
-add_executable(codegenerator "main.cpp" ${SOURCE_FILES})
+add_executable(codegenerator ${SOURCE_FILES})
+target_link_libraries(codegenerator ${Boost_LIBRARIES} ${PQXX_LIB} ${PQ_LIB})
 
-
-TARGET_LINK_LIBRARIES(codegenerator ${PQXX_LIB} ${PQ_LIB})
+target_include_directories(codegenerator PRIVATE ${Boost_INCLUDE_DIRS} ${PQXX_INCLUDE_DIRECTORIES})
