@@ -6,18 +6,16 @@
 
 class database
 {
-private:
-    pqxx::connection _connection;
 public:
     database(const char opt[]);
     database(const std::string &opt);
     ~database();
-    pqxx::result query(const char query_text[]);
     pqxx::result query(const std::string &query_text);
-    bool is_open()
-    {
-        return _connection.is_open();
-    }
+    bool is_open();
+protected:
+
+private:
+    pqxx::connection _connection;
 };
 
 #endif // DATABASE_HPP
