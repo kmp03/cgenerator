@@ -1,32 +1,56 @@
 #include <iostream>
+#include <ios>
+#include <iomanip>
+
 #include <pqxx/pqxx>
 
+#include "database.hpp"
+
+void print_query(pqxx::result res, std::ostream & os = std::cout)
+{
+    size_t num_of_rows = res.size();
+    size_t num_of_cols = res.begin()[0].size();
+    const size_t width {20};
+
+    // shows the names of columns
+    for (size_t i {0}; i < res.begin().size(); ++i)
+    {
+        if (! res.begin()[static_cast<int>(i)].is_null())
+            os << std::setw(width) << res.begin()[static_cast<int>(i)].name() << " | ";
+        else
+            os << std::setw(width) << "Null" << " | ";
+    }
+    os << std::endl;
+
+    // prints data
+    for (auto iter {res.begin()}; iter != res.end(); ++iter)
+    {
+        for (size_t col {0}; col < iter[static_cast<int>(col)].size(); ++col)
+        {
+            if (! iter[static_cast<int>(col)].is_null())
+                os << std::setw(width) << iter[static_cast<int>(col)].as<std::string>() << " | ";
+            else
+                os << std::setw(width) << "Null" << " | ";
+        }
+        os << std::endl;
+    }
+
+}
 
 int main(int, char *argv[])
 {
-  pqxx::connection c("dbname=company user=accounting");
-  pqxx::work txn(c);
-
-  pqxx::result r = txn.exec(
-    "SELECT id "
-    "FROM Employee "
-    "WHERE name =" + txn.quote(argv[1]));
-
-  if (r.size() != 1)
+  database db {"dbname=mikhail user=postgres" };
+  if (db.is_open())
   {
-    std::cerr
-      << "Expected 1 employee with name " << argv[1] << ", "
-      << "but found " << r.size() << std::endl;
-    return 1;
+      const char query[]  {
+                            R"(SELECT * FROM actor)"
+                          };
+      auto res = db.query(query);
+      print_query(res);
+
   }
-
-  int employee_id = r[0][0].as<int>();
-  std::cout << "Updating employee #" << employee_id << std::endl;
-
-  txn.exec(
-    "UPDATE EMPLOYEE "
-    "SET salary = salary + 1 "
-    "WHERE id = " + txn.quote(employee_id));
-
-  txn.commit();
+  else
+  {
+      std::cout << "ERROR" << std::endl;
+  }
 }

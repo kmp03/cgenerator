@@ -8,12 +8,12 @@ find_package(Boost)
 find_library(PQXX_LIB pqxx)
 find_library(PQ_LIB pq)
 
-set(SOURCE_FILES main.cpp)
-set(HEADER_FILES )
+set(SOURCE_FILES main.cpp database.cpp)
+set(HEADER_FILES database.hpp)
 
 add_custom_target(headers SOURCES ${HEADER_FILES})
 
 add_executable(codegenerator ${SOURCE_FILES})
-target_link_libraries(codegenerator ${Boost_LIBRARIES} ${PQXX_LIB} ${PQ_LIB})
+target_link_libraries(codegenerator ${Boost_LIB} ${PQXX_LIB} ${PQ_LIB})
 
-target_include_directories(codegenerator PRIVATE ${Boost_INCLUDE_DIRS} ${PQXX_INCLUDE_DIRECTORIES})
+target_include_directories(codegenerator PRIVATE ${Boost_INCLUDE_DIRS} ${PQXX_INCLUDE_DIRS})
