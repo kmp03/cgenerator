@@ -1,7 +1,7 @@
 #include "database.hpp"
 #include <exception>
 #include <memory>
-#include "custom_mutex.hpp"
+#include <mutex>
 
 database::database(const char opt[]) :
     _connection(opt)
@@ -25,17 +25,15 @@ pqxx::result database::query(const std::string &query_text)
 
     std::unique_ptr<pqxx::work> trans_obj = {};
 
-    custom_mutex cmutex = {};
-    cmutex.lock();
+    static std::mutex mtx;
     try {
+        std::lock_guard<std::mutex> guard (mtx);
         trans_obj.reset(new  pqxx::work(_connection));
         pqxx::result response{trans_obj->exec(query_text)} ;
         trans_obj->commit();
-        cmutex.unlock();
         return response;
     } catch (...) {
        if (trans_obj) trans_obj->abort();
-       cmutex.unlock();
        throw;
     }
 }

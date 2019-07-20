@@ -6,7 +6,6 @@
 // temporary
 #include <thread>
 #include <mutex>
-#include "custom_mutex.hpp"
 
 #include <pqxx/pqxx>
 
@@ -43,9 +42,7 @@ void print_query(pqxx::result res, std::ostream & os = std::cout)
 
 void print_square(char ch)
 {
-    custom_mutex mtx;
     std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
-    mtx.lock();
     const size_t size {10};
     for (size_t i {}; i < size; ++i)
     {
@@ -56,17 +53,34 @@ void print_square(char ch)
         std::cout << std::endl;
     }
     std::cout << std::endl;
-
-    mtx.unlock();
     std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
+}
+
+struct s
+{
+    s()
+    {
+        std::cout << "ctor\n";
+    }
+    ~s()
+    {
+        std::cout << "dtor\n";
+    }
+};
+
+void foo()
+{
+    try {
+        s a;
+        throw 12;
+    } catch (...) {
+
+        throw;
+    }
 }
 
 int main(int, char *argv[])
 {
-    std::thread thr1(print_square, 'x');
-    std::thread thr2(print_square, 'y');
-
-    thr1.join();
-    thr2.join();
+    foo();
 
 }
