@@ -15,6 +15,6 @@ private:
     static std::mutex _mutex;
     bool isLocked { false };
 };
-\
+
 
 #endif // CUSTOM_MUTEX_HPP
