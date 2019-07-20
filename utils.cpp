@@ -1,6 +1,7 @@
 #include "utils.hpp"
 
-#include <unistd.h> // linus specified
+//#include <unistd.h> // linus specified
+#include <getopt.h>
 
 #include <iostream>
 
@@ -8,30 +9,34 @@ std::map<char, std::string> utils::parse_command_line(int argc, char * argv[])
 {
     std::map<char, std::string> response;
 
-    opterr=0; // uncomment to prohibit error message to stderr
-    int rez=0;
+    const char* short_options = "c";
 
-    while ( (rez = getopt(argc,argv,"c")) != -1){
-        switch (rez){
-        case 'c':
-        {
-            try {
-                std::string str(optarg);
-            } catch (...) {
-                std::cout << "bad\n" << optarg;
-            }
-            //std::string str(optarg);
-            //response.insert(std::make_pair<char, std::string>(rez, optarg));
-            break;
-        }
-
-        case '?':
-        {
-            std::cout << "Error. Option not found" << std::endl;
-        }
-
+    int flag_config {};
+    const struct option long_options[] = {
+            {"config", required_argument, &flag_config,'c'},
+            {nullptr, 0, nullptr,0}
         };
-    };
+    int rez;
+    int option_index = -1; // if equals -1 -> short option
+    while ((rez=getopt_long(argc,argv,short_options,
+            long_options,&option_index))!=-1){
+
+            /*
+
+            */
+            switch(rez){
+                case 'c':
+                {
+                    response.insert(std::make_pair<char, std::string>('c', std::string(optarg)));
+                    break;
+                }
+                case '?': default: {
+                    std::cout << "found unknown option\n" << std::endl;
+                    break;
+                };
+            };
+        };
+
 
     return response;
 }
