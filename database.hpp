@@ -5,19 +5,17 @@
 #include <pqxx/pqxx>
 #include <mutex>
 
-class database
-{
+class database {
 public:
     database(const std::string &opt);
     ~database();
     pqxx::result query(const std::string &query_text);
     bool is_open();
-protected:
 
+protected:
 private:
     std::mutex _mutex;
     pqxx::connection _connection;
 };
 
 #endif // DATABASE_HPP
-
