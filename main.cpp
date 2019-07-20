@@ -2,14 +2,18 @@
 #include <ios>
 #include <iomanip>
 
+
+// temporary
+#include <thread>
+#include <mutex>
+#include "custom_mutex.hpp"
+
 #include <pqxx/pqxx>
 
 #include "database.hpp"
 
 void print_query(pqxx::result res, std::ostream & os = std::cout)
 {
-    size_t num_of_rows = res.size();
-    size_t num_of_cols = res.begin()[0].size();
     const size_t width {20};
 
     // shows the names of columns
@@ -37,20 +41,32 @@ void print_query(pqxx::result res, std::ostream & os = std::cout)
 
 }
 
+void print_square(char ch)
+{
+    custom_mutex mtx;
+    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
+    mtx.lock();
+    const size_t size {10};
+    for (size_t i {}; i < size; ++i)
+    {
+        for (size_t j {}; j < size; ++j)
+        {
+            std::cout << ch;
+        }
+        std::cout << std::endl;
+    }
+    std::cout << std::endl;
+
+    mtx.unlock();
+    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
+}
+
 int main(int, char *argv[])
 {
-  database db {"dbname=mikhail user=postgres" };
-  if (db.is_open())
-  {
-      const char query[]  {
-                            R"(SELECT * FROM actor)"
-                          };
-      auto res = db.query(query);
-      print_query(res);
+    std::thread thr1(print_square, 'x');
+    std::thread thr2(print_square, 'y');
 
-  }
-  else
-  {
-      std::cout << "ERROR" << std::endl;
-  }
+    thr1.join();
+    thr2.join();
+
 }

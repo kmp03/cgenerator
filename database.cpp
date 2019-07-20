@@ -1,5 +1,7 @@
 #include "database.hpp"
 #include <exception>
+#include <memory>
+#include "custom_mutex.hpp"
 
 database::database(const char opt[]) :
     _connection(opt)
@@ -20,15 +22,24 @@ database::~database()
 
 pqxx::result database::query(const std::string &query_text)
 {
+
+    std::unique_ptr<pqxx::work> trans_obj = {};
+
+    custom_mutex cmutex = {};
+    cmutex.lock();
     try {
-        pqxx::work trans_obj (this->_connection);
-        pqxx::result response {trans_obj.exec(query_text)} ;
-        trans_obj.commit();
+        trans_obj.reset(new  pqxx::work(_connection));
+        pqxx::result response{trans_obj->exec(query_text)} ;
+        trans_obj->commit();
+        cmutex.unlock();
         return response;
-    } catch (const std::exception &e) {
-        throw e;
+    } catch (...) {
+       if (trans_obj) trans_obj->abort();
+       cmutex.unlock();
+       throw;
     }
 }
+
 
 bool database::is_open()
 {
