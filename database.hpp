@@ -3,11 +3,11 @@
 
 #include <string>
 #include <pqxx/pqxx>
+#include <mutex>
 
 class database
 {
 public:
-    database(const char opt[]);
     database(const std::string &opt);
     ~database();
     pqxx::result query(const std::string &query_text);
@@ -15,6 +15,7 @@ public:
 protected:
 
 private:
+    std::mutex _mutex;
     pqxx::connection _connection;
 };
 

@@ -10,8 +10,8 @@ find_package(Boost)
 find_library(PQXX_LIB pqxx)
 find_library(PQ_LIB pq)
 
-set(SOURCE_FILES main.cpp database.cpp custom_mutex.cpp)
-set(HEADER_FILES database.hpp custom_mutex.hpp)
+set(SOURCE_FILES main.cpp database.cpp utils.cpp)
+set(HEADER_FILES database.hpp utils.hpp)
 
 add_custom_target(headers SOURCES ${HEADER_FILES})
 

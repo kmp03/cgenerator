@@ -6,10 +6,12 @@
 // temporary
 #include <thread>
 #include <mutex>
+#include <map>
 
 #include <pqxx/pqxx>
 
 #include "database.hpp"
+#include "utils.hpp"
 
 void print_query(pqxx::result res, std::ostream & os = std::cout)
 {
@@ -40,47 +42,12 @@ void print_query(pqxx::result res, std::ostream & os = std::cout)
 
 }
 
-void print_square(char ch)
+
+int main(int argc, char *argv[])
 {
-    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
-    const size_t size {10};
-    for (size_t i {}; i < size; ++i)
+    auto table  {utils::parse_command_line(argc, argv)};
+    for (auto _pair : table)
     {
-        for (size_t j {}; j < size; ++j)
-        {
-            std::cout << ch;
-        }
-        std::cout << std::endl;
+        std::cout << "option: "  << _pair.first << ", value: " << _pair.second << std::endl;
     }
-    std::cout << std::endl;
-    std::this_thread::sleep_for(std::chrono::milliseconds(30)); // kind of complex work
-}
-
-struct s
-{
-    s()
-    {
-        std::cout << "ctor\n";
-    }
-    ~s()
-    {
-        std::cout << "dtor\n";
-    }
-};
-
-void foo()
-{
-    try {
-        s a;
-        throw 12;
-    } catch (...) {
-
-        throw;
-    }
-}
-
-int main(int, char *argv[])
-{
-    foo();
-
 }
