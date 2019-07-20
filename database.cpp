@@ -24,8 +24,3 @@ pqxx::result database::query(const std::string &query_text) {
         throw;
     }
 }
-
-
-bool database::is_open() {
-    return _connection.is_open();
-}
