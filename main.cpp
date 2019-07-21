@@ -13,7 +13,13 @@
 
 int main(int argc, char *argv[]) {
     std::string name = "config.cfg";
-    config cfg(name);
+    config cfg;
+    try {
+        cfg.reset(name);
+    } catch (...) {
+        std::cout << "bad config";
+        return 1;
+    }
 
     auto table = cfg.get();
     for (auto section : table) {

@@ -35,15 +35,22 @@ void config::init() {
     std::string line;
     std::string cur_section{};
     while (std::getline(in, line)) {
-        if (line.size() && line[0] == '[') {
-            cur_section = std::string(line.begin() + 1, line.end() - 1);
-        } else if (line.size()) {
-            std::string param(line.begin(), std::find(line.begin(), line.end(), '='));
-            std::string value(std::find(line.begin(), line.end(), '=') + 1, line.end());
+        auto equal_char_iter{std::find(line.begin(), line.end(), '=')};
+        auto sharp_char_iter{std::find(line.begin(), line.end(), '#')};
+        if (line.size() && line[0] == '[' && std::find(line.begin(), line.end(), ']') != line.end() &&
+            std::distance(line.begin(), sharp_char_iter - 1) > 1) {
+            cur_section = std::string(line.begin() + 1, sharp_char_iter - 1);
+        } else if ((sharp_char_iter != line.end() && equal_char_iter == line.end()) || line.size() == 0) {
+            // do nothing
+        } else if (line.size() && equal_char_iter != line.end()) {
+            std::string param(line.begin(), equal_char_iter);
+            std::string value(equal_char_iter + 1, sharp_char_iter);
             if (!(param.size() && value.size() && cur_section.size())) {
                 throw "bad config";
             }
             m_data[cur_section][param] = value;
+        } else {
+            throw "bad config";
         }
     }
 }
