@@ -5,23 +5,28 @@
 #include <fstream>
 #include <algorithm>
 
-//#include <boost/spirit/include/classic.hpp>
-//#include <boost/spirit/include/qi.hpp>
+#include <boost/algorithm/string/trim.hpp>
 
 config::config()
-    : m_name() {
-    init();
-}
+    : m_name() {}
 
 config::config(const std::string &name)
     : m_name(name) {
-    init();
+    try {
+        init();
+    } catch (...) {
+        throw;
+    }
 }
 
 void config::reset(const std::string &name) {
     m_data = {};
     m_name = name;
-    init();
+    try {
+        init();
+    } catch (...) {
+        throw;
+    }
 }
 
 /*
@@ -34,13 +39,15 @@ void config::init() {
     }
     std::string line;
     std::string cur_section{};
-    while (std::getline(in, line)) {
+    while (std::getline(in, line)) { // better dont touch this
+        boost::algorithm::trim(line);
         auto equal_char_iter{std::find(line.begin(), line.end(), '=')};
         auto sharp_char_iter{std::find(line.begin(), line.end(), '#')};
-        if (line.size() && line[0] == '[' && std::find(line.begin(), line.end(), ']') != line.end() &&
-            std::distance(line.begin(), sharp_char_iter - 1) > 1) {
+        auto close_char_iter{std::find(line.begin(), line.end(), ']')};
+        if (line.size() && line[0] == '[' && close_char_iter != line.end() &&
+            std::distance(line.begin(), sharp_char_iter - 1) > 1 && close_char_iter < sharp_char_iter) {
             cur_section = std::string(line.begin() + 1, sharp_char_iter - 1);
-        } else if ((sharp_char_iter != line.end() && equal_char_iter == line.end()) || line.size() == 0) {
+        } else if (line[0] == '#' || line.size() == 0) {
             // do nothing
         } else if (line.size() && equal_char_iter != line.end()) {
             std::string param(line.begin(), equal_char_iter);
