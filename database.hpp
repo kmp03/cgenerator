@@ -10,7 +10,6 @@ public:
     database(const std::string &opt);
     ~database();
     pqxx::result query(const std::string &query_text);
-    bool is_open();
 
 protected:
 private:

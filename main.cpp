@@ -3,19 +3,24 @@
 #include <iomanip>
 
 // temporary
-#include <thread>
-#include <mutex>
-#include <map>
+#include <unordered_map>
 
 #include <pqxx/pqxx>
 
 #include "database.hpp"
 #include "utils.hpp"
+#include "config.hpp"
 
 int main(int argc, char *argv[]) {
-    auto table{utils::parse_command_line(argc, argv)};
+    std::string name = "config.cfg";
+    config cfg(name);
 
-    for (auto _pair : table) {
-        std::cout << "option: " << _pair.first << ", value: " << _pair.second << std::endl;
+    auto table = cfg.get();
+    for (auto section : table) {
+        std::cout << section.first << std::endl;
+        for (auto key_value : section.second) {
+            std::cout << key_value.first << "=" << key_value.second << std::endl;
+        }
+        std::cout << std::endl;
     }
 }
