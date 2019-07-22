@@ -5,6 +5,8 @@
 #include <unordered_map>
 #include <string>
 
+#include <iostream> // debug
+
 database::database(const std::string &opt)
     : _mutex()
     , _connection(opt.c_str()) {}
@@ -25,7 +27,7 @@ std::string database::config_to_string(const config &cfg) {
 
     /*
      * opt template for constructor connection
-     * "dbname = testdb user = postgres password=pass123 hostaddr=127.0.0.1 port=5432"
+     * "dbname = testdb user = postgres password=pass123 host=127.0.0.1 port=5432"
      */
 
     /*
@@ -38,9 +40,10 @@ std::string database::config_to_string(const config &cfg) {
         std::string response{"dbname = " + record.at("database_name") + " "};
         response.append("user = " + record.at("username") + " ");
         response.append("password=" + record.at("password") + " ");
-        response.append("hostaddr=" + record.at("host") + " ");
+        response.append("host=" + record.at("host") + " ");
         response.append("port=" + record.at("port"));
 
+        std::cout << response << std::endl; // DEBUG SUKA
         return response;
 
     } else {
