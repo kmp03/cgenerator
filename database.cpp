@@ -71,8 +71,8 @@ std::vector<std::string> database::get_table_names() {
     std::vector<std::string> response;
     response.reserve(tmp.size());
 
-    for (auto iter{tmp.begin()}; iter != tmp.end(); ++iter) {
-        response.push_back(iter[static_cast<int>(0)].as<std::string>());
+    for (const auto &iter : tmp) {
+        response.push_back(iter[0].as<std::string>());
     }
     return response;
 }
