@@ -5,6 +5,7 @@
 #include <pqxx/pqxx>
 #include <mutex>
 #include "config.hpp"
+#include <vector>
 
 class database {
 public:
@@ -12,6 +13,7 @@ public:
     database(const config &cfg);
     ~database();
     pqxx::result query(const std::string &query_text);
+    std::vector<std::string> get_table_names();
 
 protected:
 private:

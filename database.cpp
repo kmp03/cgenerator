@@ -4,6 +4,7 @@
 #include <mutex>
 #include <unordered_map>
 #include <string>
+#include <vector>
 
 #include <iostream> // debug
 
@@ -43,7 +44,7 @@ std::string database::config_to_string(const config &cfg) {
         response.append("host=" + record.at("host") + " ");
         response.append("port=" + record.at("port"));
 
-        std::cout << response << std::endl; // DEBUG SUKA
+        // std::cout << response << std::endl; // DEBUG SUKA
         return response;
 
     } else {
@@ -63,4 +64,15 @@ pqxx::result database::query(const std::string &query_text) {
         if (trans_obj) trans_obj->abort();
         throw;
     }
+}
+
+std::vector<std::string> database::get_table_names() {
+    pqxx::result tmp{query("SELECT datname FROM pg_database WHERE datistemplate = false;")};
+    std::vector<std::string> response;
+    response.reserve(tmp.size());
+
+    for (auto iter{tmp.begin()}; iter != tmp.end(); ++iter) {
+        response.push_back(iter[static_cast<int>(0)].as<std::string>());
+    }
+    return response;
 }
