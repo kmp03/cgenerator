@@ -72,7 +72,7 @@ std::vector<std::string> database::get_table_names() {
     response.reserve(tmp.size());
 
     for (const auto &iter : tmp) {
-        response.push_back(iter[0].as<std::string>());
+        response.push_back(iter["datname"].as<std::string>());
     }
     return response;
 }
